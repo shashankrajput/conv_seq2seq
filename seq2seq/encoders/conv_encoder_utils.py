@@ -155,7 +155,8 @@ def conv_encoder_stack(inputs, nhids_list, kwidths_list, dropout_dict, mode):
 
 
 def conv_encoder_stack_all(inputs, nhids_list, kwidths_list, dropout_dict, mode):
-    next_layers = [inputs]
+    next_layer = inputs
+    next_layers = [next_layer]
     for layer_idx in range(len(nhids_list)):
         nin = nhids_list[layer_idx] if layer_idx == 0 else nhids_list[layer_idx - 1]
         nout = nhids_list[layer_idx]
@@ -193,7 +194,7 @@ def conv_encoder_stack_all(inputs, nhids_list, kwidths_list, dropout_dict, mode)
 
 
 def get_weight(layer, layer_positional_embeddings, attention_num_units, attention_num_layers, attention_activation,
-               network_scope, fully_connected_reuse)
+               network_scope, fully_connected_reuse):
 
     weight = tf.contrib.layers.stack(tf.concat([layer, layer_positional_embeddings], 1),
                                      tf.contrib.layers.fully_connected,
@@ -212,6 +213,9 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
     weights = tf.convert_to_tensor(
         [get_weight(layer, layer_positional_embeddings, attention_num_units, attention_num_layers, attention_activation,
                     network_scope, fully_connected_reuse) for layer in next_layers])
+
+    weights = tf.nn.softmax(weights, dim=1)
+
     return tf.reduce_sum(tf.multiply(weights, next_layers), axis=1)
 
 
