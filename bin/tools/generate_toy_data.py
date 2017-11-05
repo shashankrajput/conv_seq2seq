@@ -30,6 +30,7 @@ import numpy as np
 import io
 
 PARSER = argparse.ArgumentParser(description="Generates toy datasets.")
+
 PARSER.add_argument(
     "--vocab_size", type=int, default=100, help="size of the vocabulary")
 PARSER.add_argument(
