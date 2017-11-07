@@ -171,8 +171,7 @@ class ConvProbEncoderFairseq(Encoder):
         self.fully_connected_reuse = False
 
         self.attention_num_units = self.params["cnn.attention_num_units"]
-        self.attention_num_layers, = self.params["cnn.attention_num_layers"]
-        self.attention_activation, = self.params["cnn.attention_activation"]
+        self.attention_num_layers = self.params["cnn.attention_num_layers"]
 
     @staticmethod
     def default_params():
@@ -180,6 +179,9 @@ class ConvProbEncoderFairseq(Encoder):
             "cnn.layers": 4,
             "cnn.nhids": "256,256,256,256",
             "cnn.kwidths": "3,3,3,3",
+            "cnn.layer_positional_embedding_size": 32,
+            "cnn.attention_num_units": 32,
+            "cnn.attention_num_layers": 3,
             "cnn.nhid_default": 256,
             "cnn.kwidth_default": 3,
             "embedding_dropout_keep_prob": 0.9,
@@ -208,7 +210,7 @@ class ConvProbEncoderFairseq(Encoder):
 
         return positions_embed
 
-    def encode(self, inputs, sequence_length):
+    def encode(self, inputs, sequence_length):      # TODO : Word level attention instead of sentence level
 
         embed_size = inputs.get_shape().as_list()[-1]
 
@@ -219,6 +221,7 @@ class ConvProbEncoderFairseq(Encoder):
             inputs = self._combiner_fn(inputs, positions_embed)
 
         # Apply dropout to embeddings
+
         inputs = tf.contrib.layers.dropout(
             inputs=inputs,
             keep_prob=self.params["embedding_dropout_keep_prob"],
@@ -232,17 +235,21 @@ class ConvProbEncoderFairseq(Encoder):
                 kwidths_list = parse_list_or_default(self.params["cnn.kwidths"], self.params["cnn.layers"],
                                                      self.params["cnn.kwidth_default"])
 
+
                 # mapping emb dim to hid dim
                 next_layer = linear_mapping_weightnorm(next_layer, nhids_list[0],
                                                        dropout=self.params["embedding_dropout_keep_prob"],
                                                        var_scope_name="linear_mapping_before_cnn")
+
+
                 next_layers = conv_encoder_stack_all(next_layer, nhids_list, kwidths_list,
                                                      {'src': self.params["embedding_dropout_keep_prob"],
                                                       'hid': self.params["nhid_dropout_keep_prob"]}, mode=self.mode)
 
+
                 next_layer = get_weighted_sum(next_layers, self.layer_positional_embeddings, self.attention_num_units,
                                               self.attention_num_layers,
-                                              self.attention_activation,
+                                              tf.nn.relu, # TODO: Make configurable
                                               'weighted_sum', self.fully_connected_reuse)
 
                 self.fully_connected_reuse = True

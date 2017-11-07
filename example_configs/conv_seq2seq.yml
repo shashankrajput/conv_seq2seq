@@ -1,11 +1,14 @@
 model: ConvSeq2Seq
 model_params:
   embedding.dim: 256
-  encoder.class: seq2seq.encoders.ConvEncoderFairseq
+  encoder.class: seq2seq.encoders.ConvProbEncoderFairseq
   encoder.params:
     cnn.layers: 4
     cnn.nhids: 256,256,256,256
     cnn.kwidths: 3,3,3,3
+    cnn.layer_positional_embedding_size: 16
+    cnn.attention_num_units: 32
+    cnn.attention_num_layers: 3
   decoder.class: seq2seq.decoders.ConvDecoderFairseq
   decoder.params:
     cnn.layers: 3

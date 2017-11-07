@@ -175,6 +175,7 @@ def conv_encoder_stack_all(inputs, nhids_list, kwidths_list, dropout_dict, mode)
         next_layer = conv1d_weightnorm(inputs=next_layer, layer_idx=layer_idx, out_dim=nout * 2,
                                        kernel_size=kwidths_list[layer_idx], padding="SAME", dropout=dropout_dict['hid'],
                                        var_scope_name="conv_layer_" + str(layer_idx))
+
         ''' 
         next_layer = tf.contrib.layers.conv2d(
             inputs=next_layer,
@@ -193,30 +194,39 @@ def conv_encoder_stack_all(inputs, nhids_list, kwidths_list, dropout_dict, mode)
     return next_layers
 
 
-def get_weight(layer, layer_positional_embeddings, attention_num_units, attention_num_layers, attention_activation,
+def get_weight(layer, layer_positional_embedding, attention_num_units, attention_num_layers, attention_activation,
                network_scope, fully_connected_reuse):
 
-    weight = tf.contrib.layers.stack(tf.concat([layer, layer_positional_embeddings], 1),
+    weight = tf.contrib.layers.stack(tf.concat([layer, layer_positional_embedding], -1),
                                      tf.contrib.layers.fully_connected,
                                      [attention_num_units] * attention_num_layers + [1],
                                      activation_fn=attention_activation, scope=network_scope,
                                      reuse=fully_connected_reuse)
-
-    weight = weight.squeeze()
-
+    # weight = tf.squeeze(weight, axis=-1)
     return weight
 
 
 def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_units, attention_num_layers,
                      attention_activation,
                      network_scope, fully_connected_reuse):
-    weights = tf.convert_to_tensor(
-        [get_weight(layer, layer_positional_embeddings, attention_num_units, attention_num_layers, attention_activation,
-                    network_scope, fully_connected_reuse) for layer in next_layers])
+    weights = []
+    local_reuse = fully_connected_reuse
+    for layer_index, layer in enumerate(next_layers):
+        embedding_lookup_indices = tf.multiply(tf.ones([tf.shape(layer)[0], tf.shape(layer)[1]], dtype=tf.int32, name='current_layer'),
+                                               layer_index)
 
-    weights = tf.nn.softmax(weights, dim=1)
+        layer_positional_embedding = tf.nn.embedding_lookup(layer_positional_embeddings, embedding_lookup_indices)
+        weights.append(get_weight(layer, layer_positional_embedding, attention_num_units, attention_num_layers,
+                                  attention_activation,
+                                  network_scope, local_reuse))
+        local_reuse = True
 
-    return tf.reduce_sum(tf.multiply(weights, next_layers), axis=1)
+    weights = tf.stack(weights, axis = -2)
+    weights = tf.nn.softmax(weights, dim=2)
+
+    next_layers = tf.stack(next_layers,axis=-2)
+
+    return tf.reduce_sum(tf.multiply(weights, next_layers), axis=-2)
 
 
 def conv_decoder_stack(target_embed, enc_output, inputs, nhids_list, kwidths_list, dropout_dict, mode):
