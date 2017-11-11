@@ -235,7 +235,6 @@ class ConvProbEncoderFairseq(Encoder):
                 kwidths_list = parse_list_or_default(self.params["cnn.kwidths"], self.params["cnn.layers"],
                                                      self.params["cnn.kwidth_default"])
 
-
                 # mapping emb dim to hid dim
                 next_layer = linear_mapping_weightnorm(next_layer, nhids_list[0],
                                                        dropout=self.params["embedding_dropout_keep_prob"],

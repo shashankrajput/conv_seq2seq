@@ -212,17 +212,30 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
     weights = []
     local_reuse = fully_connected_reuse
     for layer_index, layer in enumerate(next_layers):
-        embedding_lookup_indices = tf.multiply(tf.ones([tf.shape(layer)[0], tf.shape(layer)[1]], dtype=tf.int32, name='current_layer'),
+
+
+        embedding_lookup_indices = tf.multiply(tf.ones([tf.shape(layer)[0]
+                                                           #, tf.shape(layer)[1]
+                                                        ], dtype=tf.int32, name='current_layer'),
                                                layer_index)
 
         layer_positional_embedding = tf.nn.embedding_lookup(layer_positional_embeddings, embedding_lookup_indices)
+
+        layer = tf.reduce_mean(layer,axis=1)
+
         weights.append(get_weight(layer, layer_positional_embedding, attention_num_units, attention_num_layers,
                                   attention_activation,
                                   network_scope, local_reuse))
         local_reuse = True
 
     weights = tf.stack(weights, axis = -2)
-    weights = tf.nn.softmax(weights, dim=2)
+    print(weights.get_shape())
+
+    weights = tf.nn.softmax(weights, dim=1)
+
+    weights = tf.Print(weights, [weights[0]], '#####################################################', summarize=100)
+
+    weights = tf.expand_dims(weights, 1)
 
     next_layers = tf.stack(next_layers,axis=-2)
 
