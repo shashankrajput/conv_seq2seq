@@ -1,11 +1,11 @@
 export PYTHONIOENCODING=UTF-8
 
-export VOCAB_SOURCE=${HOME}/nmt_data/toy_reverse/train/vocab.sources.txt
-export VOCAB_TARGET=${HOME}/nmt_data/toy_reverse/train/vocab.targets.txt
-export TRAIN_SOURCES=${HOME}/nmt_data/toy_reverse/train/sources.txt
-export TRAIN_TARGETS=${HOME}/nmt_data/toy_reverse/train/targets.txt
-export DEV_SOURCES=${HOME}/nmt_data/toy_reverse/dev/sources.txt
-export DEV_TARGETS=${HOME}/nmt_data/toy_reverse/dev/targets.txt
+export VOCAB_SOURCE=${HOME}/Workdir/nmt_data/wmt16_en_de/vocab.bpe.32000
+export VOCAB_TARGET=${HOME}/Workdir/nmt_data/wmt16_en_de/vocab.bpe.32000
+export TRAIN_SOURCES=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2012.tok.bpe.32000.en
+export TRAIN_TARGETS=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2012.tok.bpe.32000.de
+export DEV_SOURCES=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.en
+export DEV_TARGETS=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.de
 
 export DEV_TARGETS_REF=${HOME}/nmt_data/toy_reverse/dev/targets.txt
 export TRAIN_STEPS=1000

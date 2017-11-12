@@ -229,17 +229,25 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
         local_reuse = True
 
     weights = tf.stack(weights, axis = -2)
-    print(weights.get_shape())
+    # print(weights.get_shape())
 
     weights = tf.nn.softmax(weights, dim=1)
 
-    weights = tf.Print(weights, [weights[0]], '#####################################################', summarize=100)
-
     weights = tf.expand_dims(weights, 1)
+
+    #weights = tf.Print(weights, [weights[3]], '########################', summarize=100)
+
+
 
     next_layers = tf.stack(next_layers,axis=-2)
 
-    return tf.reduce_sum(tf.multiply(weights, next_layers), axis=-2)
+    #next_layers = tf.Print(next_layers, [tf.shape(next_layers)], '##########', summarize=100)
+
+    weighted_sum = tf.reduce_sum(tf.multiply(weights, next_layers), axis=-2)
+
+    # weighted_sum = tf.Print(weighted_sum, [tf.shape(weigted_sum)], '########################', summarize=100)
+
+    return weighted_sum
 
 
 def conv_decoder_stack(target_embed, enc_output, inputs, nhids_list, kwidths_list, dropout_dict, mode):
