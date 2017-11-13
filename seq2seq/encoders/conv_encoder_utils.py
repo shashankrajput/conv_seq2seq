@@ -221,7 +221,7 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
 
         layer_positional_embedding = tf.nn.embedding_lookup(layer_positional_embeddings, embedding_lookup_indices)
 
-        layer = tf.reduce_mean(layer,axis=1)
+        layer = tf.reduce_sum(layer,axis=1)
 
         weights.append(get_weight(layer, layer_positional_embedding, attention_num_units, attention_num_layers,
                                   attention_activation,
@@ -235,7 +235,7 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
 
     weights = tf.expand_dims(weights, 1)
 
-    #weights = tf.Print(weights, [weights[3]], '########################', summarize=100)
+    weights = tf.Print(weights, [weights[3]], '########################', summarize=100)
 
 
 
