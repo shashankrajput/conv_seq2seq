@@ -1,14 +1,14 @@
 export PYTHONIOENCODING=UTF-8
 
-export VOCAB_SOURCE=${HOME}/Workdir/nmt_data/wmt16_en_de/vocab.bpe.32000
-export VOCAB_TARGET=${HOME}/Workdir/nmt_data/wmt16_en_de/vocab.bpe.32000
-export TRAIN_SOURCES=${HOME}/Workdir/nmt_data/wmt16_en_de/train.tok.clean.bpe.32000.en
-export TRAIN_TARGETS=${HOME}/Workdir/nmt_data/wmt16_en_de/train.tok.clean.bpe.32000.de
-export DEV_SOURCES=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.en
-export DEV_TARGETS=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.de
+export VOCAB_SOURCE=${HOME}/Workspace/nmt_data/wmt16_en_de/vocab.bpe.32000
+export VOCAB_TARGET=${HOME}/Workspace/nmt_data/wmt16_en_de/vocab.bpe.32000
+export TRAIN_SOURCES=${HOME}/Workspace/nmt_data/wmt16_en_de/train.tok.clean.bpe.32000.en
+export TRAIN_TARGETS=${HOME}/Workspace/nmt_data/wmt16_en_de/train.tok.clean.bpe.32000.de
+export DEV_SOURCES=${HOME}/Workspace/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.en
+export DEV_TARGETS=${HOME}/Workspace/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.de
 
 
-export DEV_TARGETS_REF=${HOME}/Workdir/nmt_data/wmt16_en_de/newstest2013.tok.de
+export DEV_TARGETS_REF=${HOME}/Workspace/nmt_data/wmt16_en_de/newstest2013.tok.de
 export TRAIN_STEPS=1000000
 
 export MODEL_DIR=${HOME}/nmt_models/nmt_conv_seq2seq_prob
