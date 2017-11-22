@@ -161,6 +161,7 @@ class ConvProbEncoderFairseq(Encoder):
 
     def __init__(self, params, mode, pos_embed, name="conv_encoder"):
         super(ConvProbEncoderFairseq, self).__init__(params, mode, name)
+
         self._combiner_fn = locate(self.params["position_embeddings.combiner_fn"])
         self.pos_embed = pos_embed
         self.layer_positional_embedding_size = self.params["cnn.layer_positional_embedding_size"]
@@ -168,7 +169,6 @@ class ConvProbEncoderFairseq(Encoder):
         self.layer_positional_embeddings = tf.get_variable("layer_positional_embeddings",
                                                            [len(self.nhids_list), self.layer_positional_embedding_size],
                                                            dtype=tf.float32)  # TODO: Make dtype configurable
-        self.fully_connected_reuse = False
 
         self.attention_num_units = self.params["cnn.attention_num_units"]
         self.attention_num_layers = self.params["cnn.attention_num_layers"]
@@ -249,9 +249,7 @@ class ConvProbEncoderFairseq(Encoder):
                 next_layer = get_weighted_sum(next_layers, self.layer_positional_embeddings, self.attention_num_units,
                                               self.attention_num_layers,
                                               tf.nn.relu, # TODO: Make configurable
-                                              'weighted_sum', self.fully_connected_reuse)
-
-                self.fully_connected_reuse = True
+                                              'weighted_sum')
 
                 next_layer = linear_mapping_weightnorm(next_layer, embed_size,
                                                        var_scope_name="linear_mapping_after_cnn")

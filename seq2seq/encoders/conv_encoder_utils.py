@@ -194,10 +194,9 @@ def conv_encoder_stack_all(inputs, nhids_list, kwidths_list, dropout_dict, mode)
     return next_layers
 
 
-def get_weight(layer, layer_positional_embedding, attention_num_units, attention_num_layers, attention_activation,
+def get_weight(layer_position_concat, attention_num_units, attention_num_layers, attention_activation,
                network_scope, fully_connected_reuse):
-
-    weight = tf.contrib.layers.stack(tf.concat([layer, layer_positional_embedding], -1),
+    weight = tf.contrib.layers.stack(layer_position_concat,
                                      tf.contrib.layers.fully_connected,
                                      [attention_num_units] * attention_num_layers + [1],
                                      activation_fn=attention_activation, scope=network_scope,
@@ -208,44 +207,36 @@ def get_weight(layer, layer_positional_embedding, attention_num_units, attention
 
 def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_units, attention_num_layers,
                      attention_activation,
-                     network_scope, fully_connected_reuse):
+                     network_scope):
     weights = []
-    local_reuse = fully_connected_reuse
+    local_reuse = False
     for layer_index, layer in enumerate(next_layers):
-
-
         embedding_lookup_indices = tf.multiply(tf.ones([tf.shape(layer)[0]
-                                                           #, tf.shape(layer)[1]
+                                                        # , tf.shape(layer)[1]
                                                         ], dtype=tf.int32, name='current_layer'),
                                                layer_index)
 
         layer_positional_embedding = tf.nn.embedding_lookup(layer_positional_embeddings, embedding_lookup_indices)
 
-        layer = tf.reduce_sum(layer,axis=1)
+        layer = tf.reduce_sum(layer, axis=1)
 
-        weights.append(get_weight(layer, layer_positional_embedding, attention_num_units, attention_num_layers,
+        layer_position_concat = tf.concat([layer, layer_positional_embedding], -1)
+
+        weights.append(get_weight(layer_position_concat, attention_num_units, attention_num_layers,
                                   attention_activation,
                                   network_scope, local_reuse))
+
         local_reuse = True
 
-    weights = tf.stack(weights, axis = -2)
-    # print(weights.get_shape())
+    weights = tf.stack(weights, axis=-2)
 
     weights = tf.nn.softmax(weights, dim=1)
 
     weights = tf.expand_dims(weights, 1)
 
-    weights = tf.Print(weights, [weights[3]], '########################', summarize=100)
-
-
-
-    next_layers = tf.stack(next_layers,axis=-2)
-
-    #next_layers = tf.Print(next_layers, [tf.shape(next_layers)], '##########', summarize=100)
+    next_layers = tf.stack(next_layers, axis=-2)
 
     weighted_sum = tf.reduce_sum(tf.multiply(weights, next_layers), axis=-2)
-
-    # weighted_sum = tf.Print(weighted_sum, [tf.shape(weigted_sum)], '########################', summarize=100)
 
     return weighted_sum
 
