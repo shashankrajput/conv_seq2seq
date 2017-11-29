@@ -232,6 +232,8 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
 
     weights = tf.nn.softmax(weights, dim=1)
 
+    weights = tf.Print(weights,[weights[0]],message="##########weights:",summarize=100)
+
     weights = tf.expand_dims(weights, 1)
 
     next_layers = tf.stack(next_layers, axis=-2)

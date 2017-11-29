@@ -1,10 +1,10 @@
 model: ConvSeq2Seq
 model_params:
-  embedding.dim: 128
+  embedding.dim: 64
   encoder.class: seq2seq.encoders.ConvProbEncoderFairseq
   encoder.params:
     cnn.layers: 4
-    cnn.nhids: 128,128,128,128
+    cnn.nhids: 64,64,64,64
     cnn.kwidths: 3,3,3,3
     cnn.layer_positional_embedding_size: 16
     cnn.attention_num_units: 32
@@ -12,7 +12,7 @@ model_params:
   decoder.class: seq2seq.decoders.ConvDecoderFairseq
   decoder.params:
     cnn.layers: 2
-    cnn.nhids: 128,128
+    cnn.nhids: 64,64
     cnn.kwidths: 3,3
   optimizer.name: Momentum
   optimizer.params:
