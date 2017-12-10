@@ -18,20 +18,12 @@ set -e
 
 BASE_DIR="/home/shashank/Workspace/conv_seq2seq/"
 
-OUTPUT_DIR=${OUTPUT_DIR:-$HOME/Workspace/data/nmt_data/wmt16_en_de}
+OUTPUT_DIR=${OUTPUT_DIR:-$HOME/Workspace/data/nmt_data/small_wmt16_en_de}
 echo "Writing to ${OUTPUT_DIR}. To change this, set the OUTPUT_DIR environment variable."
 
 OUTPUT_DIR_DATA="${OUTPUT_DIR}/data"
 
 mkdir -p $OUTPUT_DIR_DATA
-
-echo "Downloading Europarl v7. This may take a while..."
-wget -nc -nv -O ${OUTPUT_DIR_DATA}/europarl-v7-de-en.tgz \
-  http://www.statmt.org/europarl/v7/de-en.tgz
-
-echo "Downloading Common Crawl corpus. This may take a while..."
-wget -nc -nv -O ${OUTPUT_DIR_DATA}/common-crawl.tgz \
-  http://www.statmt.org/wmt13/training-parallel-commoncrawl.tgz
 
 echo "Downloading News Commentary v11. This may take a while..."
 wget -nc -nv -O ${OUTPUT_DIR_DATA}/nc-v11.tgz \
@@ -45,10 +37,6 @@ wget -nc -nv -O  ${OUTPUT_DIR_DATA}/test.tgz \
 
 # Extract everything
 echo "Extracting all files..."
-mkdir -p "${OUTPUT_DIR_DATA}/europarl-v7-de-en"
-tar -xvzf "${OUTPUT_DIR_DATA}/europarl-v7-de-en.tgz" -C "${OUTPUT_DIR_DATA}/europarl-v7-de-en"
-mkdir -p "${OUTPUT_DIR_DATA}/common-crawl"
-tar -xvzf "${OUTPUT_DIR_DATA}/common-crawl.tgz" -C "${OUTPUT_DIR_DATA}/common-crawl"
 mkdir -p "${OUTPUT_DIR_DATA}/nc-v11"
 tar -xvzf "${OUTPUT_DIR_DATA}/nc-v11.tgz" -C "${OUTPUT_DIR_DATA}/nc-v11"
 mkdir -p "${OUTPUT_DIR_DATA}/dev"
@@ -57,15 +45,11 @@ mkdir -p "${OUTPUT_DIR_DATA}/test"
 tar -xvzf "${OUTPUT_DIR_DATA}/test.tgz" -C "${OUTPUT_DIR_DATA}/test"
 
 # Concatenate Training data
-cat "${OUTPUT_DIR_DATA}/europarl-v7-de-en/europarl-v7.de-en.en" \
-  "${OUTPUT_DIR_DATA}/common-crawl/commoncrawl.de-en.en" \
-  "${OUTPUT_DIR_DATA}/nc-v11/training-parallel-nc-v11/news-commentary-v11.de-en.en" \
+cat "${OUTPUT_DIR_DATA}/nc-v11/training-parallel-nc-v11/news-commentary-v11.de-en.en" \
   > "${OUTPUT_DIR}/train.en"
 wc -l "${OUTPUT_DIR}/train.en"
 
-cat "${OUTPUT_DIR_DATA}/europarl-v7-de-en/europarl-v7.de-en.de" \
-  "${OUTPUT_DIR_DATA}/common-crawl/commoncrawl.de-en.de" \
-  "${OUTPUT_DIR_DATA}/nc-v11/training-parallel-nc-v11/news-commentary-v11.de-en.de" \
+cat "${OUTPUT_DIR_DATA}/nc-v11/training-parallel-nc-v11/news-commentary-v11.de-en.de" \
   > "${OUTPUT_DIR}/train.de"
 wc -l "${OUTPUT_DIR}/train.de"
 
@@ -142,13 +126,13 @@ ${BASE_DIR}/bin/tools/generate_vocab.py --delimiter "" \
 
 # Create vocabulary for EN data
 $BASE_DIR/bin/tools/generate_vocab.py \
-   --max_vocab_size 50000 \
+   --max_vocab_size 15000 \
   < ${OUTPUT_DIR}/train.tok.clean.en \
   > ${OUTPUT_DIR}/vocab.50k.en \
 
 # Create vocabulary for DE data
 $BASE_DIR/bin/tools/generate_vocab.py \
-  --max_vocab_size 50000 \
+  --max_vocab_size 15000 \
   < ${OUTPUT_DIR}/train.tok.clean.de \
   > ${OUTPUT_DIR}/vocab.50k.de \
 

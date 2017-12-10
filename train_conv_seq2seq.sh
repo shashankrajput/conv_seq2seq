@@ -8,9 +8,9 @@ export DEV_SOURCES=${HOME}/Workspace/data/nmt_data/wmt16_en_de/newstest2013.tok.
 export DEV_TARGETS=${HOME}/Workspace/data/nmt_data/wmt16_en_de/newstest2013.tok.bpe.32000.de
 
 export DEV_TARGETS_REF=${HOME}/Workspace/data/nmt_data/wmt16_en_de/newstest2013.tok.de
-export TRAIN_STEPS=1000000
+export TRAIN_STEPS=100000
 
-export MODEL_DIR=${HOME}/Workspace/checkpoints/nmt_models/nmt_conv_seq2seq
+export MODEL_DIR=${HOME}/Workspace/checkpoints/nmt_models/small_nmt_conv_seq2seq
 mkdir -p $MODEL_DIR
 
 
@@ -37,7 +37,7 @@ python -m bin.train \
        target_files:
         - $DEV_TARGETS" \
   --batch_size 32 \
-  --eval_every_n_steps 50 \
+  --eval_every_n_steps 2000 \
   --train_steps $TRAIN_STEPS \
   --output_dir $MODEL_DIR
 

@@ -168,7 +168,7 @@ class ConvProbEncoderFairseq(Encoder):
         self.nhids_list = self.params["cnn.nhids"]
         self.layer_positional_embeddings = tf.get_variable("layer_positional_embeddings",
                                                            [len(self.nhids_list), self.layer_positional_embedding_size],
-                                                           dtype=tf.float32)  # TODO: Make dtype configurable
+                                                           dtype=tf.float32, initializer=tf.random_normal_initializer())  # TODO: Make dtype configurable
 
         self.attention_num_units = self.params["cnn.attention_num_units"]
         self.attention_num_layers = self.params["cnn.attention_num_layers"]

@@ -216,7 +216,11 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
                                                         ], dtype=tf.int32, name='current_layer'),
                                                layer_index)
 
+        # embedding_lookup_indices = tf.Print(embedding_lookup_indices, [tf.shape(embedding_lookup_indices)], message="##########embedding_lookup_indices:", summarize=100)
+
         layer_positional_embedding = tf.nn.embedding_lookup(layer_positional_embeddings, embedding_lookup_indices)
+
+        # layer_positional_embedding = tf.Print(layer_positional_embedding, [tf.shape(layer_positional_embedding)], message="##########layer_positional_embedding:", summarize=100)
 
         layer = tf.reduce_sum(layer, axis=1)
 
@@ -228,15 +232,20 @@ def get_weighted_sum(next_layers, layer_positional_embeddings, attention_num_uni
 
         local_reuse = True
 
+
     weights = tf.stack(weights, axis=-2)
+
+    #weights = tf.Print(weights, [tf.shape(weights)], message="##########weights1:", summarize=100)
 
     weights = tf.nn.softmax(weights, dim=1)
 
-    weights = tf.Print(weights,[weights[0]],message="##########weights:",summarize=100)
+    weights = tf.Print(weights, [weights[2]],message="##########weights2:",summarize=100)
 
     weights = tf.expand_dims(weights, 1)
 
     next_layers = tf.stack(next_layers, axis=-2)
+
+    # next_layers = tf.Print(next_layers,[tf.shape(next_layers)],message="##########next_layers:",summarize=100)
 
     weighted_sum = tf.reduce_sum(tf.multiply(weights, next_layers), axis=-2)
 
